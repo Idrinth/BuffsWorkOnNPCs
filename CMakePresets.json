@@ -1,0 +1,111 @@
+{
+    "version": 2,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 21,
+        "patch": 0
+    },
+    "configurePresets": [
+        {
+            "name": "base",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_CXX_FLAGS": "$env{COMMONLIBSSE_COMPILER} $env{COMMONLIBSSE_PLATFORM} $env{COMMONLIBSSE_TEXT}"
+            }
+        },
+        {
+            "name": "vcpkg",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+                "VCPKG_TARGET_TRIPLET": "x64-windows-skse",
+                "VCPKG_HOST_TRIPLET": "x64-windows-skse",
+                "VCPKG_OVERLAY_TRIPLETS": "${sourceDir}/cmake",
+                "CMAKE_MSVC_RUNTIME_LIBRARY": "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL"
+            }
+        },
+        {
+            "name": "win32",
+            "hidden": true,
+            "environment": {
+                "COMMONLIBSSE_PLATFORM": "-DWIN32_LEAN_AND_MEAN -DNOMINMAX"
+            }
+        },
+        {
+            "name": "win32-unicode",
+            "hidden": true,
+            "inherits": "win32",
+            "environment": {
+                "COMMONLIBSSE_TEXT": "-DUNICODE -D_UNICODE"
+            }
+        },
+        {
+            "name": "x64",
+            "hidden": true,
+            "architecture": {
+                "value": "x64",
+                "strategy": "external"
+            }
+        },
+        {
+            "name": "clang-cl",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "clang-cl",
+                "CMAKE_CXX_COMPILER": "clang-cl"
+            },
+            "environment": {
+                "COMMONLIBSSE_COMPILER": "/permissive- /EHsc -Wno-overloaded-virtual -Wno-delete-non-abstract-non-virtual-dtor -D__cpp_lib_char8_t -D__cpp_consteval -D__cpp_lib_format $penv{CXXFLAGS}"
+            },
+            "vendor": {
+                "microsoft.com/VisualStudioSettings/CMake/1.0": {
+                    "intelliSenseMode": "windows-clang-x64",
+                    "enableMicrosoftCodeAnalysis": true,
+                    "enableClangTidyCodeAnalysis": true
+                }
+            }
+        },
+        {
+            "name": "build-tests",
+            "displayName": "Build Tests",
+            "hidden": true,
+            "description": "Include test suites in the build.",
+            "cacheVariables": {
+                "BUILD_TESTS": {
+                    "type": "STRING",
+                    "value": "ON"
+                }
+            }
+        },
+        {
+            "name": "build-release-clang-cl",
+            "inherits": [
+                "base",
+                "vcpkg",
+                "win32-unicode",
+                "x64",
+                "build-tests",
+                "clang-cl"
+            ],
+            "displayName": "Release",
+            "description": "Optimized release build.",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/release-clang",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": {
+                    "type": "STRING",
+                    "value": "Release"
+                }
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "release-clang-cl",
+            "displayName": "Release (Clang)",
+            "configurePreset": "build-release-clang-cl",
+            "description": "Optimized release build."
+        }
+    ],
+    "testPresets": []
+}
