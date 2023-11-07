@@ -119,6 +119,10 @@ public:
     RE::BSEventNotifyControl ProcessEvent(const RE::TESEquipEvent* event, RE::BSTEventSource<RE::TESEquipEvent>* eventSource)
     {
         logger::debug("Equipment changed");
+        if (!event->actor) {
+            logger::trace("-no target");
+            return RE::BSEventNotifyControl::kContinue;
+        }
         if (event->actor->IsPlayer() || event->actor->IsPlayerRef()) {
             logger::trace("-PLAYER");
             return RE::BSEventNotifyControl::kContinue;
@@ -134,6 +138,10 @@ public:
     RE::BSEventNotifyControl ProcessEvent(const RE::TESActiveEffectApplyRemoveEvent* event, RE::BSTEventSource<RE::TESActiveEffectApplyRemoveEvent>* eventSource)
     {
         logger::trace("Effects changed");
+        if (!event->target) {
+            logger::trace("-no target");
+            return RE::BSEventNotifyControl::kContinue;
+        }
         if (event->target->IsPlayer() || event->target->IsPlayerRef()) {
             logger::trace("-PLAYER");
             return RE::BSEventNotifyControl::kContinue;
